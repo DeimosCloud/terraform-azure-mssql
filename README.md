@@ -9,7 +9,6 @@ module "mssql" {
   source = "git::https://gitlab.com/deimosdev/tooling/terraform-modules/terraform-mssql-azure"
 
   database_name       = "test"
-  subnet_id           = var.subnet_id
   resource_group_name = azurerm_resource_group.resource_group.name
   location            = var.location
 
@@ -21,46 +20,41 @@ module "mssql" {
 }
 ```
 
-This creates a `backend.tf` file in the specified `backend_output_path` (default: project directory). Apply the configured backend by running `terraform init` again
-
 ## Requirements
 
-| Name | Version |
-|------|---------|
-| terraform | >= 0.12 |
-| azurerm | ~> 2.0.0 |
-| local | >= 1.2 |
-| null | >= 2.1 |
-| random | >= 2.1 |
-| template | >= 2.1 |
+No requirements.
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| azurerm | ~> 2.0.0 |
-| null | >= 2.1 |
-| random | >= 2.1 |
-| template | >= 2.1 |
+| azurerm | n/a |
+| random | n/a |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| backend\_output\_path | The default file to output backend configuration to | `string` | `"./backend.tf"` | no |
-| container\_name | The Name of the Storage Container within the Storage Account. | `string` | `""` | no |
-| key | The name of the Blob used to retrieve/store Terraform's State file inside the Storage Container. | `string` | `"global/terrform.tfstate"` | no |
-| location | The location of resource group | `any` | n/a | yes |
-| name\_prefix | The prefix for all created resources | `string` | `"tfstate"` | no |
-| resource\_group\_name | The Name of the Resource Group in which the Storage Account exists. | `string` | `""` | no |
-| storage\_account\_name | The name of the storage account | `string` | `""` | no |
+| admin\_login\_name | The administrator login name for the SQL Server | `string` | `""` | no |
+| database\_name | The name of the Ms SQL Database. Changing this forces a new resource to be created. | `any` | n/a | yes |
+| location | Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created. | `any` | n/a | yes |
+| max\_size\_gb | the max size of the database in gigabytes. | `number` | `20` | no |
+| public\_network\_access\_enabled | Whether or not public network access is allowed for this server | `bool` | `false` | no |
+| resource\_group\_name | The name of the resource group where the SQL server resides | `any` | n/a | yes |
+| server\_name | The name of the server to be created | `string` | `""` | no |
+| server\_version | The version of the MSSQL server. | `string` | `"12.0"` | no |
+| subnet\_id | The ID of the subnet that the SQL server will be connected to. If specified, a virtual network rule is created for server. The subnet should have the Microsoft.Sql service endpoint enabled | `string` | `""` | no |
+| tags | Tags to be passed to created instances | `map` | `{}` | no |
+| vnet\_rule\_name | The name of the SQL virtual network rule to be created | `string` | `""` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| key | The name of the Blob created to retrieve/store Terraform's State file inside the Storage Container |
-| resource\_group | Name of created resource group |
-| storage\_account | Name of created storage account |
-| storage\_container | Name of created storage container |
+| server\_administrator\_login | Administrator Login username |
+| server\_administrator\_login\_password | Administration login password |
+| server\_id | The id of the server the MSSQL database was provisioned on |
+| server\_name | The name of the server the MSSQL database was provisioned on |
+| subnet\_id | The ID of the subnet that the SQL server is connected to. |
+| vnet\_rule\_id | The ID of the SQL virtual network rule |
 

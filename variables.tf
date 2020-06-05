@@ -3,7 +3,8 @@ variable "database_name" {
 }
 
 variable "subnet_id" {
-  description = "The ID of the subnet that the SQL server will be connected to"
+  description = "The ID of the subnet that the SQL server will be connected to. If specified, a virtual network rule is created for server. The subnet should have the Microsoft.Sql service endpoint enabled"
+  default     = ""
 }
 
 variable "tags" {
