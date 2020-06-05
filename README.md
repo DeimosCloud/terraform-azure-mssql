@@ -22,14 +22,19 @@ module "mssql" {
 
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12 |
+| azurerm | >= 2.1.0 |
+| local | >= 1.2 |
+| random | >= 2.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| azurerm | n/a |
-| random | n/a |
+| azurerm | >= 2.1.0 |
+| random | >= 2.1 |
 
 ## Inputs
 
