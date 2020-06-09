@@ -10,7 +10,6 @@ module "mssql" {
 
   database_name       = "test"
   resource_group_name = azurerm_resource_group.resource_group.name
-  location            = var.location
 
   tags = {
     environment = "TEST"
@@ -29,7 +28,6 @@ module "mssql" {
 
   database_name       = "test"
   resource_group_name = azurerm_resource_group.resource_group.name
-  location            = var.location
   create_vnet_rule    = true
   subnet_id           = var.subnet_id  # The subnet must have Microsoft.Sql service endpoint enabled
 
@@ -50,7 +48,6 @@ module "mssql" {
 
   database_name           = "test"
   resource_group_name     = azurerm_resource_group.resource_group.name
-  location                = var.location
   create_private_endpoint = true
   subnet_id               = var.subnet_id  # The subnet must enable private link endpoints
 
