@@ -32,7 +32,7 @@ variable "server_name" {
 }
 
 variable "create_vnet_rule" {
-  description = "whether to create the vnet rule. The subnet passed must have the Microsoft.Sql service endpoint enabled"
+  description = "whether to create the vnet rule"
   default     = false
 }
 
@@ -47,7 +47,7 @@ variable "public_network_access_enabled" {
 }
 
 variable "create_private_endpoint" {
-  description = "Whether to create a private endpoint access for the SQL Server. The subnet id must be provided ifthis is true and must have enabled private_link_endpoints"
+  description = "Whether to create a private endpoint access for the SQL Server. The subnet id must be provided ifthis is true"
   default     = false
 }
 
@@ -57,6 +57,28 @@ variable "private_endpoint_name" {
 }
 
 variable "subnet_id" {
-  description = "The subnet id to attach private_endpoint/vnet firewall rule to"
+  description = "The subnet id to attach private_endpoint/vnet firewall rule to. For Vnet firewall rule, The subnet passed must have the Microsoft.Sql service endpoint enabled"
   default     = ""
+}
+
+variable "private_dns_zone_name" {
+  description = "The Private DNS Zone to use to create the Private FQDN for the SQL server if private. Once specified, an FQDN is created for the Private Link"
+  default     = null
+}
+
+variable "private_fqdn_subdomain" {
+  description = "The subdomain to deploy database on for the private_dns_zone"
+  default     = ".database"
+  type        = string
+}
+
+variable "allow_access_to_azure_services" {
+  description = "Makes server accessible to Authenticated requests from Azure services"
+  default     = false
+}
+
+variable "clients_ip" {
+  description = "A list of client IPs to be whitelisted for access to SQL Server. Example [{start_ip: 0.0.0.0, end_ip: 0.0.0.1},]"
+  type        = list(map(string))
+  default     = []
 }

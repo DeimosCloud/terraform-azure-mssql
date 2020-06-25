@@ -44,11 +44,17 @@ output "private_link_endpoint_name" {
 
 output "private_endpoint_ip_address" {
   description = "The private IP address associated with the private endpoint"
-  value       = azurerm_private_endpoint.private_endpoint[0].private_ip_address
+  value       = azurerm_private_endpoint.private_endpoint[0].private_service_connection[0].private_ip_address
 
   depends_on = [azurerm_private_endpoint.private_endpoint]
 }
 
+output "private_fqdn" {
+  description = "The private FQDN of the SQL Server based on the associated Private Endpoint"
+  value       = azurerm_private_dns_a_record.mssql_fqdn.0.fqdn
+
+  depends_on = [azurerm_private_dns_a_record.mssql_fqdn]
+}
 
 output "vnet_rule_id" {
   description = "The ID of the SQL virtual network rule"

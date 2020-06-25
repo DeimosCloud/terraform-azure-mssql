@@ -32,6 +32,15 @@ locals {
   private_endpoint_name = var.private_endpoint_name == "" ? "private-endpoint-${random_id.this.hex}" : var.private_endpoint_name
 }
 
+# MSSQL Virtual Network Rule
+resource "azurerm_sql_virtual_network_rule" "sqlvnetrule" {
+  count               = var.create_vnet_rule == false ? 0 : 1
+  name                = local.vnet_rule_name
+  resource_group_name = data.azurerm_resource_group.mssql.name
+  server_name         = azurerm_mssql_server.sqlserver.name
+  subnet_id           = var.subnet_id
+}
+
 # MSSQL Server
 resource "azurerm_mssql_server" "sqlserver" {
   name                          = local.sqlserver_name
@@ -43,15 +52,6 @@ resource "azurerm_mssql_server" "sqlserver" {
   public_network_access_enabled = var.public_network_access_enabled
 
   tags = var.tags
-}
-
-# MSSQL Virtual Network Rule
-resource "azurerm_sql_virtual_network_rule" "sqlvnetrule" {
-  count               = var.create_vnet_rule == false ? 0 : 1
-  name                = local.vnet_rule_name
-  resource_group_name = data.azurerm_resource_group.mssql.name
-  server_name         = azurerm_mssql_server.sqlserver.name
-  subnet_id           = var.subnet_id
 }
 
 # MSSQL Database
@@ -79,4 +79,36 @@ resource "azurerm_private_endpoint" "private_endpoint" {
   }
 
   tags = var.tags
+}
+
+resource "azurerm_private_dns_a_record" "mssql_fqdn" {
+  count               = var.private_dns_zone_name == null ? 0 : 1
+  name                = "${local.sqlserver_name}${var.private_fqdn_subdomain}"
+  zone_name           = var.private_dns_zone_name
+  resource_group_name = data.azurerm_resource_group.mssql.name
+  ttl                 = 10
+  records             = [azurerm_private_endpoint.private_endpoint[0].private_service_connection[0].private_ip_address]
+
+  depends_on = [azurerm_private_endpoint.private_endpoint]
+  tags       = var.tags
+}
+
+
+resource "azurerm_sql_firewall_rule" "azure_service_access" {
+  count               = var.allow_access_to_azure_services ? 1 : 0
+  name                = "Azure-service-access"
+  resource_group_name = data.azurerm_resource_group.mssql.name
+  server_name         = local.sqlserver_name
+  start_ip_address    = "0.0.0.0" # setting start and end ip to 0.0.0.0 enables azure service access
+  end_ip_address      = "0.0.0.0"
+}
+
+
+resource "azurerm_sql_firewall_rule" "clients_ip_rules" {
+  count               = length(var.clients_ip)
+  name                = "firewall_rule-${var.clients_ip[count.index]["start_ip"]}-${var.clients_ip[count.index]["end_ip"]}"
+  resource_group_name = data.azurerm_resource_group.mssql.name
+  server_name         = local.sqlserver_name
+  start_ip_address    = var.clients_ip[count.index]["start_ip"]
+  end_ip_address      = var.clients_ip[count.index]["end_ip"]
 }
