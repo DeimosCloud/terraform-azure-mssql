@@ -1,5 +1,6 @@
-variable "database_name" {
-  description = "The name of the Ms SQL Database. Changing this forces a new resource to be created."
+variable "database_names" {
+  description = "A list of database names to be created in the same server.  Changing this forces a new resource to be created."
+  default     = []
 }
 
 variable "tags" {
@@ -14,6 +15,12 @@ variable "resource_group_name" {
 variable "server_version" {
   description = "The version of the MSSQL server."
   default     = "12.0"
+}
+
+
+variable "server_id" {
+  description = "The SQL Server ID to be used to create DB. If specified, the a new SQL Server is not created"
+  default     = null
 }
 
 variable "max_size_gb" {
@@ -57,7 +64,7 @@ variable "private_endpoint_name" {
 }
 
 variable "subnet_id" {
-  description = "The subnet id to attach private_endpoint/vnet firewall rule to. For Vnet firewall rule, The subnet passed must have the Microsoft.Sql service endpoint enabled"
+  description = "The subnet id to attach private_endpoint/vnet firewall rule to"
   default     = ""
 }
 
@@ -81,4 +88,10 @@ variable "clients_ip" {
   description = "A list of client IPs to be whitelisted for access to SQL Server. Example [{start_ip: 0.0.0.0, end_ip: 0.0.0.1},]"
   type        = list(map(string))
   default     = []
+}
+
+# Terraform needs to know the count on plan, so it cannot depend on external variables like server_id
+variable "create_server" {
+  description = "Whether to create SQL Server or not. Specifying false means a server_id must be provided to work with"
+  default     = true
 }

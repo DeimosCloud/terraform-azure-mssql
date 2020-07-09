@@ -23,26 +23,18 @@ resource "random_string" "this" {
 
 locals {
   # Name of SQL Server
-  sqlserver_name = var.server_name == "" ? "server-${var.database_name}" : var.server_name
+  sqlserver_name = var.server_name == "" ? "server-mssql-${random_id.this.hex}" : var.server_name
   # Name of virtual network rule for sql server
-  vnet_rule_name = var.vnet_rule_name == "" ? "vnet-rule-${var.database_name}" : var.vnet_rule_name
+  vnet_rule_name = var.vnet_rule_name == "" ? "vnet-rule-mssql-${random_id.this.hex}" : var.vnet_rule_name
   # Admin login name
   admin_login_name = var.admin_login_name == "" ? "admin-${random_id.this.hex}" : var.admin_login_name
   # Private endpoint name
   private_endpoint_name = var.private_endpoint_name == "" ? "private-endpoint-${random_id.this.hex}" : var.private_endpoint_name
 }
 
-# MSSQL Virtual Network Rule
-resource "azurerm_sql_virtual_network_rule" "sqlvnetrule" {
-  count               = var.create_vnet_rule == false ? 0 : 1
-  name                = local.vnet_rule_name
-  resource_group_name = data.azurerm_resource_group.mssql.name
-  server_name         = azurerm_mssql_server.sqlserver.name
-  subnet_id           = var.subnet_id
-}
-
 # MSSQL Server
 resource "azurerm_mssql_server" "sqlserver" {
+  count                         = var.create_server == true ? 1 : 0
   name                          = local.sqlserver_name
   resource_group_name           = data.azurerm_resource_group.mssql.name
   location                      = data.azurerm_resource_group.mssql.location
@@ -54,10 +46,12 @@ resource "azurerm_mssql_server" "sqlserver" {
   tags = var.tags
 }
 
+
 # MSSQL Database
 resource "azurerm_mssql_database" "mssql_database" {
-  name        = var.database_name
-  server_id   = azurerm_mssql_server.sqlserver.id
+  count       = length(var.database_names)
+  name        = var.database_names[count.index]
+  server_id   = var.server_id == null ? azurerm_mssql_server.sqlserver.0.id : var.server_id
   max_size_gb = var.max_size_gb
 
   tags = var.tags
@@ -73,7 +67,7 @@ resource "azurerm_private_endpoint" "private_endpoint" {
 
   private_service_connection {
     name                           = "privateserviceconnection-${random_id.this.hex}"
-    private_connection_resource_id = azurerm_mssql_server.sqlserver.id
+    private_connection_resource_id = azurerm_mssql_server.sqlserver.0.id
     subresource_names              = ["sqlServer"]
     is_manual_connection           = false
   }
