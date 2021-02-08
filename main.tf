@@ -1,13 +1,3 @@
-terraform {
-  required_version = ">= 0.12"
-
-  required_providers {
-    azurerm = ">= 2.1.0"
-    local   = ">= 1.2"
-    random  = ">= 2.1"
-  }
-}
-
 data azurerm_resource_group "mssql" {
   name = var.resource_group_name
 }
