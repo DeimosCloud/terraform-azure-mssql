@@ -86,16 +86,14 @@ Full contributing guidelines are covered [here](CONTRIBUTING.md).
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12 |
-| azurerm | >= 2.1.0 |
-| local | >= 1.2 |
-| random | >= 2.1 |
+| azurerm | ~> 2.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| azurerm | >= 2.1.0 |
-| random | >= 2.1 |
+| azurerm | ~> 2.0 |
+| random | n/a |
 
 ## Inputs
 
@@ -135,4 +133,5 @@ Full contributing guidelines are covered [here](CONTRIBUTING.md).
 | server\_domain\_name | The fully qualified domain name of the Azure SQL Server (e.g. myServerName.database.windows.net |
 | server\_id | The id of the server the MSSQL database was provisioned on |
 | server\_name | The name of the server the MSSQL database was provisioned on |
+
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
